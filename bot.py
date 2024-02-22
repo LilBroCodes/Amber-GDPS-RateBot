@@ -17,7 +17,7 @@ import get_levels as server
 import get_levels_verbose
 import mod_actions
 import sql
-from gdlib import process_levels, generate_embed
+from gdlib import process_levels, generate_embed, change_log_format
 from colorlog import ColoredFormatter
 
 if len(sys.argv) != 3:
@@ -31,12 +31,12 @@ loop = 300
 loopls = [""] * 300
 bot = commands.Bot(command_prefix='--', intents=discord.Intents.all())
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("main")
 logger.setLevel(logging.INFO)
 
 formatter = ColoredFormatter(
-    '%(log_color)s%(levelname)-8s%(reset)s %(message)s',
-    datefmt=None,
+    '[%(asctime)s] [%(levelname)-8s] %(name)s: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
     reset=True,
     log_colors={
         'DEBUG': 'white',
@@ -48,6 +48,7 @@ formatter = ColoredFormatter(
     secondary_log_colors={},
     style='%'
 )
+
 
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(formatter)
@@ -61,7 +62,6 @@ async def send_level_messages(channel, processed):
         for i, data in enumerate(processed[1:]):
             try:
                 embed = generate_embed(data, processed, i)
-                logger.info(embed.description)
                 await channel.send(embed=embed)
             except Exception as e:
                 logger.error(f"Error generating embed: {e}")
@@ -77,6 +77,7 @@ async def job():
         processed = process_levels("levels.json", session)
         await send_level_messages(channel, processed)
     except Exception as e:
+        logger = change_log_format("main")
         logger.error(f"Error in job(): {e}")
         if "<!D" in str(e):
             with open("../error.html", "w") as error_file:
@@ -95,6 +96,7 @@ async def main_loop():
 
 def print_remaining_time(left: int):
     if left <= 60:
+        logger = change_log_format("main")
         logger.info(f"Next check in {left} seconds.")
     else:
         m = str(int(left / 60))
@@ -103,10 +105,12 @@ def print_remaining_time(left: int):
         s = str(left % 60)
         if len(s) == 1:
             s = f"0{s}"
+        logger = change_log_format("level_check")
         logger.info(f"Next check in {m}:{s} ({left}s)")
 
 @bot.event
 async def on_ready():
+    logger = change_log_format("session")
     logger.info(f'Logged in as {bot.user.name} ({bot.user.id})')
     await bot.loop.create_task(main_loop())
 
@@ -207,7 +211,8 @@ def is_admin(ctx):
 @commands.check(is_admin)
 async def spam(ctx, amount=10, message="No message provided"):
     for _ in range(amount):
-        print(f"Sending message {_}/{amount}")
+        logger = change_log_format("discord_bot")
+        logger.info(f"Sending message {_}/{amount}")
         await ctx.send(message)
 
 
@@ -241,7 +246,7 @@ async def play(ctx, *, link):
         await ctx.send(f'Now playing: {yt.title}')
     except Exception as e:
         await ctx.send(f'Error: {e}')
-        
+
 
 @bot.command(name='browser')
 async def open_browser(ctx):

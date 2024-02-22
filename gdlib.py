@@ -1,8 +1,43 @@
 import json
+import logging
+
 import discord
 import time
-
 import requests
+from colorlog import ColoredFormatter
+from logging.handlers import RotatingFileHandler
+from datetime import datetime
+
+current_time = datetime.now()
+time_string = current_time.strftime("%Y-%m-%d_%H")
+
+file_handler = RotatingFileHandler(f"logs/{time_string}.log", maxBytes=10 * 1024 * 1024, backupCount=5)
+
+
+def change_log_format(name: str):
+    new_logger = logging.getLogger(name)
+    new_logger.setLevel(logging.INFO)
+
+    new_formatter = ColoredFormatter(
+        f'[%(asctime)s] [%(levelname)-8s] %(name)s: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+        reset=True,
+        log_colors={
+            'DEBUG': 'white',
+            'INFO': 'white',
+            'WARNING': 'green',
+            'ERROR': 'red',
+            'CRITICAL': 'red',
+        },
+        secondary_log_colors={},
+        style='%'
+    )
+    new_logger.addHandler(file_handler)
+
+    new_stream_handler = logging.StreamHandler()
+    new_stream_handler.setFormatter(new_formatter)
+    new_logger.addHandler(new_stream_handler)
+    return new_logger
 
 
 def get_gd_diff(diff: int, auto: int, demon: int):
@@ -76,7 +111,8 @@ def process_levels(filename, session: requests.Session):
 
 def generate_embed(data, processed: list, i: int) -> discord.Embed:
     level_name = data["level_name"]
-    print(f"Sending message for level {level_name}. ({i + 1}/{len(processed[1:])})")
+    logger = change_log_format("main")
+    logger.info(f"Sending message for level {level_name}. ({i + 1}/{len(processed[1:])})")
     author = data["author"]
     level_id = data["level_id"]
     difficulty = data["difficulty"]

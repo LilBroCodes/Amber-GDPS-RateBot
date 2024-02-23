@@ -1,6 +1,5 @@
 import json
 import time
-import webbrowser
 
 import discord
 import requests
@@ -275,16 +274,6 @@ async def play(ctx, *, link):
         await ctx.send(f"Now playing: {yt.title}")
     except Exception as e:
         await ctx.send(f"Error: {e}")
-
-
-@bot.command(name="browser")
-async def open_browser(ctx):
-    # Open the default web browser
-    webbrowser.open(
-        "https://www.example.com"
-    )  # You can replace this URL with the desired URL
-
-    await ctx.send("Opening the default web browser.")
 
 
 @bot.event

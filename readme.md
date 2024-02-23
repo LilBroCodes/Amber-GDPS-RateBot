@@ -42,10 +42,11 @@ Once installed and running, GDPS-Ratebot operates within the designated Discord 
 - `--get-acc-by-id <id>`: Retrieves account data based on the provided ID.
 - `--gdps-audit <count>`: Displays recent moderation actions on the GDPS.
 - `--get-level <id>`: Retrieves data of the level identified by the given ID.
-- `--play <link>`: Plays audio from the provided YouTube link in a voice channel.
 - `--leave`: Forces the bot to leave the voice channel.
 - `--giveto <member> <giveaway>`: Adds a member to the specified giveaway.
 - `--list-people <giveaway>`: Lists members participating in the specified giveaway.
+#### WIP
+- `--play <link>`: Plays audio from the provided YouTube link in a voice channel.
 
 ## Contributing
 

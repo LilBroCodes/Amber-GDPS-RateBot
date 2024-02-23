@@ -29,24 +29,24 @@ TOKEN = sys.argv[2]
 
 loop = 300
 loopls = [""] * 300
-bot = commands.Bot(command_prefix='--', intents=discord.Intents.all())
+bot = commands.Bot(command_prefix="--", intents=discord.Intents.all())
 
 logger = logging.getLogger("main")
 logger.setLevel(logging.INFO)
 
 formatter = ColoredFormatter(
-    '[%(asctime)s] [%(levelname)-8s] %(name)s: %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
+    "[%(asctime)s] [%(levelname)-8s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
     reset=True,
     log_colors={
-        'DEBUG': 'white',
-        'INFO': 'white',
-        'WARNING': 'green',
-        'ERROR': 'red',
-        'CRITICAL': 'red',
+        "DEBUG": "white",
+        "INFO": "white",
+        "WARNING": "green",
+        "ERROR": "red",
+        "CRITICAL": "red",
     },
     secondary_log_colors={},
-    style='%'
+    style="%",
 )
 
 
@@ -73,7 +73,9 @@ async def job():
     channel = bot.get_channel(CHANNEL_ID)
 
     try:
-        server.save_levels_data(server.get_levels("https://amber.ps.fhgdps.com/getLevels.php", session))
+        server.save_levels_data(
+            server.get_levels("https://amber.ps.fhgdps.com/getLevels.php", session)
+        )
         processed = process_levels("levels.json", session)
         await send_level_messages(channel, processed)
     except Exception as e:
@@ -94,6 +96,7 @@ async def main_loop():
                 print_remaining_time(shift)
             shift -= 1
 
+
 def print_remaining_time(left: int):
     if left <= 60:
         logger = change_log_format("main")
@@ -108,23 +111,29 @@ def print_remaining_time(left: int):
         logger = change_log_format("level_check")
         logger.info(f"Next check in {m}:{s} ({left}s)")
 
+
 @bot.event
 async def on_ready():
     logger = change_log_format("session")
-    logger.info(f'Logged in as {bot.user.name} ({bot.user.id})')
+    logger.info(f"Logged in as {bot.user.name} ({bot.user.id})")
     await bot.loop.create_task(main_loop())
 
 
-@bot.command(name="get_level", help="Sends data about a specific level from the gdps,"
-                                    " input is the id of the level.")
+@bot.command(
+    name="get_level",
+    help="Sends data about a specific level from the gdps,"
+    " input is the id of the level.",
+)
 async def get_level(ctx, level_id=93, *, debug=False):
     start_time = time.time()
-    get_levels.save_levels_data(get_levels.get_levels("https://amber.ps.fhgdps.com/getLevels.php"))
+    get_levels.save_levels_data(
+        get_levels.get_levels("https://amber.ps.fhgdps.com/getLevels.php")
+    )
     if debug:
         await ctx.send("Step 1/4, Refreshed levels.")
     with open("levels.json", "r") as file:
         levels = json.load(file)
-    levels = levels.get('data')
+    levels = levels.get("data")
     if debug:
         await ctx.send("Step 2/4, Imported level data")
     for level_data in levels:
@@ -137,7 +146,9 @@ async def get_level(ctx, level_id=93, *, debug=False):
         else:
             continue
     if debug:
-        await ctx.send(f"Step 4/4, Done in {str(time.time() - start_time)[:4]} seconds.  ")
+        await ctx.send(
+            f"Step 4/4, Done in {str(time.time() - start_time)[:4]} seconds.  "
+        )
 
 
 @bot.command(name="get-acc-by-id")
@@ -152,7 +163,9 @@ async def get_accounts_id(ctx, account_id=21, *, debug=False):
 
 @bot.command(name="gdps-audit")
 async def get_gdps_mod_actions(ctx, count=5):
-    response = mod_actions.get_moderator_actions(count=count, url="https://amber.ps.fhgdps.com/modActions.php")
+    response = mod_actions.get_moderator_actions(
+        count=count, url="https://amber.ps.fhgdps.com/modActions.php"
+    )
     await ctx.send(embed=response)
 
 
@@ -160,32 +173,38 @@ async def get_gdps_mod_actions(ctx, count=5):
 async def help_commands(ctx, command=None):
     embed = discord.Embed(
         title="Help",
-        color=0x0377fc,
+        color=0x0377FC,
         description="""
             Available commands:
             --get-acc-by-id <id>
             --gdps-audit <count>
             --get-level <id>
             --help <name of command> (optional)
-        """
+        """,
     )
     if command is None:
         await ctx.send(embed=embed)
     else:
         if command == "get-acc-by-id":
             embed.title = f"Help for {command}"
-            embed.description = ("<id> needs tp be an integer \n"
-                                 " Returns the data of the account with the given id. (WIP)")
+            embed.description = (
+                "<id> needs tp be an integer \n"
+                " Returns the data of the account with the given id. (WIP)"
+            )
             await ctx.send(embed=embed)
         elif command == "gdps-audit":
             embed.title = f"Help for {command}"
-            embed.description = ("Returns <count> mod actions from the gdps (Max is 5 for now,"
-                                 " no more fit in a single message)")
+            embed.description = (
+                "Returns <count> mod actions from the gdps (Max is 5 for now,"
+                " no more fit in a single message)"
+            )
             await ctx.send(embed=embed)
         elif command == "get-level":
             embed.title = f"Help for {command}"
-            embed.description = ("Returns the data of the level with the given id, will later have difficulty faces, "
-                                 "but it is also WIP.")
+            embed.description = (
+                "Returns the data of the level with the given id, will later have difficulty faces, "
+                "but it is also WIP."
+            )
             await ctx.send(embed=embed)
         elif command == "help":
             embed.title = f"Help for {command}"
@@ -198,9 +217,15 @@ async def help_commands(ctx, command=None):
 @bot.command(name="sex")
 async def sex(ctx):
     await ctx.send("don do dat")
-    await ctx.send("https://cdn.discordapp.com/attachments/1191419321881206825/1195028652518289428/tienes_14_activa_cam_loop.mov?ex=65b28029&is=65a00b29&hm=a936eba3d3c2868a2b3316a409700309cdc61665de9ea3b7cff348fd82d54fca&")
-    await ctx.send("https://cdn.discordapp.com/attachments/1191419321881206825/1191551882808791071/Screenshot_20231230_120920_TikTok.jpg?ex=65af14aa&is=659c9faa&hm=86ee8872628f73a01f1e6482209536f5b51fde8f8da3a741cb8d77d722430b58&")
-    await ctx.send("https://cdn.discordapp.com/attachments/1191419321881206825/1193620322830798898/image0-2.jpg?ex=65ad608d&is=659aeb8d&hm=028d4b22a47f4fdba32db019882771ae1eb92617aa5704c4022300404070ecf2&")
+    await ctx.send(
+        "https://cdn.discordapp.com/attachments/1191419321881206825/1195028652518289428/tienes_14_activa_cam_loop.mov?ex=65b28029&is=65a00b29&hm=a936eba3d3c2868a2b3316a409700309cdc61665de9ea3b7cff348fd82d54fca&"
+    )
+    await ctx.send(
+        "https://cdn.discordapp.com/attachments/1191419321881206825/1191551882808791071/Screenshot_20231230_120920_TikTok.jpg?ex=65af14aa&is=659c9faa&hm=86ee8872628f73a01f1e6482209536f5b51fde8f8da3a741cb8d77d722430b58&"
+    )
+    await ctx.send(
+        "https://cdn.discordapp.com/attachments/1191419321881206825/1193620322830798898/image0-2.jpg?ex=65ad608d&is=659aeb8d&hm=028d4b22a47f4fdba32db019882771ae1eb92617aa5704c4022300404070ecf2&"
+    )
 
 
 def is_admin(ctx):
@@ -219,14 +244,17 @@ async def spam(ctx, amount=10, message="No message provided"):
 async def play_audio(voice_channel, url):
     logger = change_log_format("discord_bot")
     try:
-        voice_channel.play(discord.FFmpegPCMAudio(url), after=lambda e: logger.info('done', e, voice_channel))
+        voice_channel.play(
+            discord.FFmpegPCMAudio(url),
+            after=lambda e: logger.info("done", e, voice_channel),
+        )
     except discord.errors.ClientException as e:
         # Retry if a ClientException occurs (you can customize this based on the specific exception)
         logger.error(f"Error during playback: {e}")
         await play_audio(voice_channel, url)
 
 
-@bot.command(name='play')
+@bot.command(name="play")
 async def play(ctx, *, link):
     channel = ctx.author.voice.channel
 
@@ -244,17 +272,19 @@ async def play(ctx, *, link):
         # Play the downloaded audio with retry mechanism
         await play_audio(voice_channel, yt_stream.url)
 
-        await ctx.send(f'Now playing: {yt.title}')
+        await ctx.send(f"Now playing: {yt.title}")
     except Exception as e:
-        await ctx.send(f'Error: {e}')
+        await ctx.send(f"Error: {e}")
 
 
-@bot.command(name='browser')
+@bot.command(name="browser")
 async def open_browser(ctx):
     # Open the default web browser
-    webbrowser.open('https://www.example.com')  # You can replace this URL with the desired URL
+    webbrowser.open(
+        "https://www.example.com"
+    )  # You can replace this URL with the desired URL
 
-    await ctx.send('Opening the default web browser.')
+    await ctx.send("Opening the default web browser.")
 
 
 @bot.event
@@ -263,49 +293,50 @@ async def on_voice_state_update(member, before, after):
     logger = change_log_format("discord_bot")
     if bot.user.id == member.id and before.channel and not before.channel.members:
         await before.channel.disconnect()
-        logger.info('Bot left the voice channel.')
+        logger.info("Bot left the voice channel.")
 
 
-@bot.command(name='leave')
+@bot.command(name="leave")
 async def leave(ctx):
     voice_channel = discord.utils.get(bot.voice_clients, guild=ctx.guild)
 
     if voice_channel:
         await voice_channel.disconnect(force=True)
-        await ctx.send('Left the voice channel.')
+        await ctx.send("Left the voice channel.")
 
 
-@bot.command(name='giveto')
+@bot.command(name="giveto")
 @commands.check(is_admin)
 async def give_to(ctx, member, giveaway):
     with open("giveaways.json", "r") as file:
         giveaways = json.load(file)
-    giveaways = giveaways.get('giveaways')
+    giveaways = giveaways.get("giveaways")
     if giveaway not in giveaways:
-        giveaway_data = {
-            "members": []
-        }
+        giveaway_data = {"members": []}
         giveaways[giveaway] = giveaway_data
-    giveaways.get(giveaway).get('members').append(member)
+    giveaways.get(giveaway).get("members").append(member)
     with open("giveaways.json", "w") as file:
-        giveaways = {
-            "giveaways": giveaways
-        }
+        giveaways = {"giveaways": giveaways}
         json.dump(giveaways, file, indent=1)
     await ctx.send(f"Successfully added {member} to the giveaway '{giveaway}'.")
 
 
-@bot.command(name='list-people')
+@bot.command(name="list-people")
 async def list_people(ctx, giveaway):
     with open("giveaways.json", "r") as file:
         giveaways = json.load(file)
-    giveaways = giveaways.get('giveaways')
+    giveaways = giveaways.get("giveaways")
     if giveaway not in giveaways:
         giveaways.append(giveaway)
-    members = giveaways.get(giveaway).get('members')
+    members = giveaways.get(giveaway).get("members")
     embed_desc = "\n".join(members)
-    embed = discord.Embed(description=embed_desc, color=int("#3d7eff"[1:], 16), title=f"Members in {giveaway}:")
+    embed = discord.Embed(
+        description=embed_desc,
+        color=int("#3d7eff"[1:], 16),
+        title=f"Members in {giveaway}:",
+    )
     await ctx.send(embed=embed)
+
 
 # Start the bot
 bot.run(TOKEN)

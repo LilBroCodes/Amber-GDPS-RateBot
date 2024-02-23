@@ -1,5 +1,6 @@
 import json
 import logging
+import os.path
 
 import discord
 import time
@@ -10,6 +11,9 @@ from datetime import datetime
 
 current_time = datetime.now()
 time_string = current_time.strftime("%Y-%m-%d_%H")
+
+if not os.path.isdir("logs/"):
+    os.makedirs("logs")
 
 file_handler = RotatingFileHandler(f"logs/{time_string}.log", maxBytes=10 * 1024 * 1024, backupCount=5)
 

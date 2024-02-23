@@ -217,11 +217,12 @@ async def spam(ctx, amount=10, message="No message provided"):
 
 
 async def play_audio(voice_channel, url):
+    logger = change_log_format("discord_bot")
     try:
-        voice_channel.play(discord.FFmpegPCMAudio(url), after=lambda e: print('done', e, voice_channel))
+        voice_channel.play(discord.FFmpegPCMAudio(url), after=lambda e: logger.info('done', e, voice_channel))
     except discord.errors.ClientException as e:
         # Retry if a ClientException occurs (you can customize this based on the specific exception)
-        print(f"Error during playback: {e}")
+        logger.error(f"Error during playback: {e}")
         await play_audio(voice_channel, url)
 
 
@@ -259,9 +260,10 @@ async def open_browser(ctx):
 @bot.event
 async def on_voice_state_update(member, before, after):
     # Check if the bot is in a voice channel and if the voice channel is empty
+    logger = change_log_format("discord_bot")
     if bot.user.id == member.id and before.channel and not before.channel.members:
         await before.channel.disconnect()
-        print('Bot left the voice channel.')
+        logger.info('Bot left the voice channel.')
 
 
 @bot.command(name='leave')
